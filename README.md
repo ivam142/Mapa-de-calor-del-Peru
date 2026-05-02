@@ -12,3 +12,10 @@ library(dplyr)     # manipulación de datos
 library(tidyverse)
 ```
 Hay muchas formas de crear un mapa del calor
+```{r}
+mapa <- st_read("C:/Users/yonns/Downloads/v_departamentos_2023_01052026/v_departamentos_2023.shp")
+names(mapa)
+mapview(mapa, zcol = "nombdep"
+```
+Dándonos un mapa interactivo
+![alt text](mapa1.png)
