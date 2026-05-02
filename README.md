@@ -19,7 +19,8 @@ names(mapa)
 mapview(mapa, zcol = "nombdep"
 ```
 Dándonos un mapa interactivo
-![alt text](mapa1.png)
+<p align="center"><img src="mapa1.png" width="50%"></p>
+
 
 ## Mapa simple
 Ahora veremos como crar un mapa del Perú utilizando los resultados al 98% de las elecciones generales 2026 del Perú, se hará sobre ganador por departamento.
@@ -81,7 +82,7 @@ ggplot(mapa_final) +
     legend.position = "right"
   )
 ```
-![alt text](image.png)
+<p align="center"><img src="image.png" width="50%"></p>
 
 ## Mapa Interactivo
 Para este caso, es importante tener la librería plotly descargada y debidamente cargada.
@@ -105,3 +106,10 @@ p <- ggplot(mapa_final) +
 mapa_interactivo <- ggplotly(p, tooltip = "text")
 mapa_interactivo
 ```
+Dándonos el siguiente mapa:
+
+<p align="center"><img src="mapa2.png" width="50%"></p>
+
+Este mapa, al ser interactivo, nos permite deslizar el mouse hacia cada departamento, informándonos así la cantidad exacta de votos. Del mismo modo, se puede hacer zoom.
+
+<img src="mapa21.png" width="45%"> <img src="mapa23.png" width="45%">
