@@ -19,3 +19,7 @@ mapview(mapa, zcol = "nombdep"
 ```
 Dándonos un mapa interactivo
 ![alt text](mapa1.png)
+
+Ahora veremos como crar un mapa del Perú utilizando los resultados al 98% de las elecciones generales 2026 del Perú, se hará sobre ganador por departamento.
+
+Utilizamos las librerías anteriormente mencionadas e importamos el archivo shapefile.
