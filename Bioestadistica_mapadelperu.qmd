@@ -1,0 +1,119 @@
+---
+title: "Bioestadistica_Tarea2"
+format: html
+editor: visual
+---
+```{r}
+library(plotly)
+library(sf)        # manejar shapefiles
+library(ggplot2)   # graficar
+library(dplyr)     # manipulación de datos
+library(tidyverse)
+```
+
+```{r}
+mapa <- st_read("C:/Users/yonns/Downloads/v_departamentos_2023_01052026/v_departamentos_2023.shp")
+datos_elecciones <- read.csv("C:/Users/yonns/Downloads/resultadonpe222.csv", 
+                             sep = ";",      
+                             encoding = "UTF-8")
+
+if(ncol(datos_elecciones) == 1) {
+  datos_elecciones <- read.csv2("C:/Users/yonns/Downloads/resultadonpe222.csv", encoding = "UTF-8")
+}
+
+names(datos_elecciones)
+colnames(mapa)
+print(mapa)
+```
+```{r}
+# 1. Limpieza radical de nombres (Mayúsculas, sin tildes, sin espacios)
+datos_elecciones <- datos_elecciones %>% 
+  mutate(DEPARTAMENTO = trimws(toupper(iconv(DEPARTAMENTO, to = "ASCII//TRANSLIT"))))
+
+peru_sh <- mapa %>% 
+  mutate(nombdep = trimws(toupper(iconv(nombdep, to = "ASCII//TRANSLIT"))))
+
+```
+
+```{r}
+names(datos_elecciones)
+
+datos_elecciones <- datos_elecciones %>%
+  mutate(PORCENTAJE = as.numeric(gsub("%", "", PORCENTAJE)))
+
+glimpse(datos_elecciones$PORCENTAJE)
+
+head(datos_elecciones)
+print(datos_elecciones)
+```
+
+```{r}
+#Limpieza de nombres
+datos_elecciones <- datos_elecciones %>% 
+  mutate(DEPARTAMENTO = toupper(iconv(DEPARTAMENTO, to = "ASCII//TRANSLIT")))
+
+peru_sh <- mapa %>% 
+  mutate(nombdep = toupper(iconv(nombdep, to = "ASCII//TRANSLIT")))
+
+mapa_final <- peru_sh %>%
+  left_join(datos_elecciones, by = c("nombdep" = "DEPARTAMENTO"))
+
+# Reordenar CANDIDATO por PORCENTAJE (de mayor a menor)
+# Esto hace que la leyenda se ordene automáticamente
+mapa_final <- mapa_final %>%
+  mutate(CANDIDATO = reorder(CANDIDATO, -PORCENTAJE, FUN = mean, na.rm = TRUE))
+```
+
+```{r}
+mis_colores <- c(
+  "KEIKO SOFIA FUJIMORI HIGUCHI"   = "orange",
+  "RAFAEL BERNARDO LÓPEZ ALIAGA CAZORLA" = "#34c3eb",
+  "ROBERTO HELBERT SANCHEZ PALOMINO"   = "red",
+  "JORGE NIETO MONTESINOS" = "yellow",
+  "RICARDO PABLO BELMONT CASSINELLI" = "green"
+)
+```
+
+```{r}
+ggplot(mapa_final) +
+  geom_sf(aes(fill = CANDIDATO), color = "black", size = 0.2) +
+  
+  scale_fill_manual(values = mis_colores) + 
+  
+  labs(
+    title = "ELECCIONES GENERALES 2026:\nGANADORES POR DEPARTAMENTO",
+    caption = "Fuente: ONPE 2026",
+    fill = "Candidatos"
+  ) +
+  
+  theme_void() + 
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5, color = "darkblue"),
+    plot.caption = element_text(size = 8, hjust = 1),
+    legend.position = "right"
+  )
+  
+```
+
+```{r}
+# Haciendo un mapa interactivo
+mapa_final <- mapa_final %>%
+  mutate(texto_interactivo = paste0(
+    "Departamento: ", nombdep, "\n",
+    "Ganador: ", CANDIDATO, "\n",
+    "Porcentaje: ", PORCENTAJE, "%\n",
+    "Votos Totales: ", format(VOTOS, big.mark = ",") # Para que salgan con comas de miles
+  ))
+```
+
+```{r}
+p <- ggplot(mapa_final) +
+  geom_sf(aes(fill = CANDIDATO, text = texto_interactivo), color = "white", size = 0.1) +
+  scale_fill_manual(values = mis_colores) +
+  theme_void() +
+  labs(title = "Mapa Interactivo: Elecciones 2026")
+
+mapa_interactivo <- ggplotly(p, tooltip = "text")
+
+mapa_interactivo
+```
