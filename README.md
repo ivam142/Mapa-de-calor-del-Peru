@@ -2,7 +2,8 @@ Este es un tutorial sobre como hacer un mapa del calor del Perú.
 
 Primero comenzamos buscando el archivo de los límites departamentales del Perú en formato Shapefile (.shp), este archivo se puede encontrar y descargar en la Plataforma de información territorial de la Secretaría de Demarcación y Organización Territorial del Perú: https://geosdot.servicios.gob.pe/visor/
 
-1) Iniciamos cargando las librerías que necesitaremos
+## Mapa base
+Iniciamos cargando las librerías que necesitaremos
 
 ```{r}
 library(plotly)
@@ -20,6 +21,7 @@ mapview(mapa, zcol = "nombdep"
 Dándonos un mapa interactivo
 ![alt text](mapa1.png)
 
+## Mapa simple
 Ahora veremos como crar un mapa del Perú utilizando los resultados al 98% de las elecciones generales 2026 del Perú, se hará sobre ganador por departamento.
 
 Utilizamos las librerías anteriormente mencionadas e importamos el archivo shapefile junto al archivo con los resultados a mostrar.
@@ -78,4 +80,28 @@ ggplot(mapa_final) +
     plot.caption = element_text(size = 8, hjust = 1),
     legend.position = "right"
   )
+```
+![alt text](image.png)
+
+## Mapa Interactivo
+Para este caso, es importante tener la librería plotly descargada y debidamente cargada.
+
+```{r}
+mapa_final <- mapa_final %>%
+  mutate(texto_interactivo = paste0(
+    "Departamento: ", nombdep, "\n",
+    "Ganador: ", CANDIDATO, "\n",
+    "Porcentaje: ", PORCENTAJE, "%\n",
+    "Votos Totales: ", format(VOTOS, big.mark = ",") # Para que salgan con comas de miles
+  ))
+```
+
+```{r}
+p <- ggplot(mapa_final) +
+  geom_sf(aes(fill = CANDIDATO, text = texto_interactivo), color = "white", size = 0.1) +
+  scale_fill_manual(values = mis_colores) +
+  theme_void() +
+  labs(title = "Mapa Interactivo: Elecciones 2026")
+mapa_interactivo <- ggplotly(p, tooltip = "text")
+mapa_interactivo
 ```
