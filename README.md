@@ -11,3 +11,4 @@ library(ggplot2)   # graficar
 library(dplyr)     # manipulación de datos
 library(tidyverse)
 ```
+Hay muchas formas de crear un mapa del calor
